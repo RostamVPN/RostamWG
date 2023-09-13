@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"math/rand"
 	"net"
 	"os"
@@ -125,16 +124,18 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 		)
 		return err
 	}
+	var sendBuffer [][]byte
 	// so only packet processed for cookie generation
 	var junkedHeader []byte
 	if peer.device.isAdvancedSecurityOn() {
 		peer.device.aSecMux.RLock()
-		err = peer.sendJunkPackets()
+		junks, err := peer.createJunkPackets()
 		if err != nil {
 			peer.device.aSecMux.RUnlock()
 			peer.device.log.Errorf("%v - %v", peer, err)
 			return err
 		}
+		sendBuffer = append(sendBuffer, junks...)
 		if peer.device.aSecCfg.initPacketJunkSize != 0 {
 			buf := make([]byte, 0, peer.device.aSecCfg.initPacketJunkSize)
 			writer := bytes.NewBuffer(buf[:0])
@@ -157,8 +158,10 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 
 	peer.timersAnyAuthenticatedPacketTraversal()
 	peer.timersAnyAuthenticatedPacketSent()
-
-	err = peer.SendBuffers([][]byte{junkedHeader})
+	
+	sendBuffer = append(sendBuffer, junkedHeader)
+	
+	err = peer.SendBuffers(sendBuffer)
 	if err != nil {
 		peer.device.log.Errorf(
 			"%v - Failed to send handshake initiation: %v",
@@ -481,9 +484,9 @@ top:
 	}
 }
 
-func (peer *Peer) sendJunkPackets() error {
+func (peer *Peer) createJunkPackets() ([][]byte, error) {
 	if peer.device.aSecCfg.junkPacketCount == 0 {
-		return nil
+		return nil, nil
 	}
 
 	junks := make([][]byte, 0, peer.device.aSecCfg.junkPacketCount)
@@ -499,15 +502,11 @@ func (peer *Peer) sendJunkPackets() error {
 				peer,
 				err,
 			)
-			return err
+			return nil, err
 		}
 		junks = append(junks, junk)
 	}
-	err := peer.SendBuffers(junks)
-	if err != nil {
-		return fmt.Errorf("failed to send junks: %v", err)
-	}
-	return nil
+	return junks, nil
 }
 
 func (peer *Peer) FlushStagedPackets() {
