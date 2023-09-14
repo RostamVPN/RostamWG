@@ -117,11 +117,7 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 
 	msg, err := peer.device.CreateMessageInitiation(peer)
 	if err != nil {
-		peer.device.log.Errorf(
-			"%v - Failed to create initiation message: %v",
-			peer,
-			err,
-		)
+		peer.device.log.Errorf("%v - Failed to create initiation message: %v", peer, err)
 		return err
 	}
 	var sendBuffer [][]byte
@@ -163,11 +159,7 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 	
 	err = peer.SendBuffers(sendBuffer)
 	if err != nil {
-		peer.device.log.Errorf(
-			"%v - Failed to send handshake initiation: %v",
-			peer,
-			err,
-		)
+		peer.device.log.Errorf("%v - Failed to send handshake initiation: %v", peer, err)
 	}
 	peer.timersHandshakeInitiated()
 
@@ -183,11 +175,7 @@ func (peer *Peer) SendHandshakeResponse() error {
 
 	response, err := peer.device.CreateMessageResponse(peer)
 	if err != nil {
-		peer.device.log.Errorf(
-			"%v - Failed to create response message: %v",
-			peer,
-			err,
-		)
+		peer.device.log.Errorf("%v - Failed to create response message: %v", peer, err)
 		return err
 	}
 	var junkedHeader []byte
@@ -227,11 +215,7 @@ func (peer *Peer) SendHandshakeResponse() error {
 	// TODO: allocation could be avoided
 	err = peer.SendBuffers([][]byte{junkedHeader})
 	if err != nil {
-		peer.device.log.Errorf(
-			"%v - Failed to send handshake response: %v",
-			peer,
-			err,
-		)
+		peer.device.log.Errorf("%v - Failed to send handshake response: %v", peer, err)
 	}
 	return err
 }
@@ -239,10 +223,7 @@ func (peer *Peer) SendHandshakeResponse() error {
 func (device *Device) SendHandshakeCookie(
 	initiatingElem *QueueHandshakeElement,
 ) error {
-	device.log.Verbosef(
-		"Sending cookie response for denied handshake message for %v",
-		initiatingElem.endpoint.DstToString(),
-	)
+	device.log.Verbosef("Sending cookie response for denied handshake message for %v", initiatingElem.endpoint.DstToString())
 
 	sender := binary.LittleEndian.Uint32(initiatingElem.packet[4:8])
 	reply, err := device.cookieChecker.CreateReply(
@@ -269,8 +250,7 @@ func (peer *Peer) keepKeyFreshSending() {
 		return
 	}
 	nonce := keypair.sendNonce.Load()
-	if nonce > RekeyAfterMessages ||
-		(keypair.isInitiator && time.Since(keypair.created) > RekeyAfterTime) {
+	if nonce > RekeyAfterMessages || (keypair.isInitiator && time.Since(keypair.created) > RekeyAfterTime) {
 		peer.SendHandshakeInitiation(false)
 	}
 }
@@ -373,18 +353,12 @@ func (device *Device) RoutineReadFromTUN() {
 				// TODO: record stat for this
 				// This will happen if MSS is surprisingly small (< 576)
 				// coincident with reasonably high throughput.
-				device.log.Verbosef(
-					"Dropped some packets from multi-segment read: %v",
-					readErr,
-				)
+				device.log.Verbosef("Dropped some packets from multi-segment read: %v", readErr)
 				continue
 			}
 			if !device.isClosed() {
 				if !errors.Is(readErr, os.ErrClosed) {
-					device.log.Errorf(
-						"Failed to read packet from TUN device: %v",
-						readErr,
-					)
+					device.log.Errorf("Failed to read packet from TUN device: %v", readErr)
 				}
 				go device.Close()
 			}
@@ -419,8 +393,7 @@ top:
 	}
 
 	keypair := peer.keypairs.Current()
-	if keypair == nil || keypair.sendNonce.Load() >= RejectAfterMessages ||
-		time.Since(keypair.created) >= RejectAfterTime {
+	if keypair == nil || keypair.sendNonce.Load() >= RejectAfterMessages || time.Since(keypair.created) >= RejectAfterTime {
 		peer.SendHandshakeInitiation(false)
 		return
 	}
@@ -451,9 +424,7 @@ top:
 			*elems = (*elems)[:i]
 
 			if elemsOOO != nil {
-				peer.StagePackets(
-					elemsOOO,
-				) // XXX: Out of order, but we can't front-load go chans
+				peer.StagePackets(elemsOOO) // XXX: Out of order, but we can't front-load go chans
 			}
 
 			if len(*elems) == 0 {
@@ -573,12 +544,7 @@ func (device *Device) RoutineEncryption(id int) {
 		// encrypt content and release to consumer
 
 		binary.LittleEndian.PutUint64(nonce[4:], elem.nonce)
-		elem.packet = elem.keypair.send.Seal(
-			header,
-			nonce[:],
-			elem.packet,
-			nil,
-		)
+		elem.packet = elem.keypair.send.Seal(header, nonce[:], elem.packet, nil)
 		elem.Unlock()
 	}
 }
@@ -586,10 +552,7 @@ func (device *Device) RoutineEncryption(id int) {
 func (peer *Peer) RoutineSequentialSender(maxBatchSize int) {
 	device := peer.device
 	defer func() {
-		defer device.log.Verbosef(
-			"%v - Routine: sequential sender - stopped",
-			peer,
-		)
+		defer device.log.Verbosef("%v - Routine: sequential sender - stopped", peer)
 		peer.stopping.Done()
 	}()
 	device.log.Verbosef("%v - Routine: sequential sender - started", peer)

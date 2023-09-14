@@ -55,10 +55,7 @@ func (peer *Peer) keepKeyFreshReceiving() {
 		return
 	}
 	keypair := peer.keypairs.Current()
-	if keypair != nil && keypair.isInitiator &&
-		time.Since(
-			keypair.created,
-		) > (RejectAfterTime-KeepaliveTimeout-RekeyTimeout) {
+	if keypair != nil && keypair.isInitiator && time.Since(keypair.created) > (RejectAfterTime-KeepaliveTimeout-RekeyTimeout) {
 		peer.timers.sentLastMinuteHandshake.Store(true)
 		peer.SendHandshakeInitiation(false)
 	}
@@ -115,11 +112,7 @@ func (device *Device) RoutineReceiveIncoming(
 			if errors.Is(err, net.ErrClosed) {
 				return
 			}
-			device.log.Verbosef(
-				"Failed to receive %s packet: %v",
-				recvName,
-				err,
-			)
+			device.log.Verbosef("Failed to receive %s packet: %v", recvName, err)
 			if neterr, ok := err.(net.Error); ok && !neterr.Temporary() {
 				return
 			}
@@ -351,10 +344,7 @@ func (device *Device) RoutineHandshake(id int) {
 
 				// verify MAC2 field
 
-				if !device.cookieChecker.CheckMAC2(
-					elem.packet,
-					elem.endpoint.DstToBytes(),
-				) {
+				if !device.cookieChecker.CheckMAC2(elem.packet, elem.endpoint.DstToBytes()) {
 					device.SendHandshakeCookie(&elem)
 					goto skip
 				}
@@ -387,10 +377,7 @@ func (device *Device) RoutineHandshake(id int) {
 			// consume initiation
 			peer := device.ConsumeMessageInitiation(&msg)
 			if peer == nil {
-				device.log.Verbosef(
-					"Received invalid initiation message from %s",
-					elem.endpoint.DstToString(),
-				)
+				device.log.Verbosef("Received invalid initiation message from %s", elem.endpoint.DstToString())
 				goto skip
 			}
 
@@ -423,10 +410,7 @@ func (device *Device) RoutineHandshake(id int) {
 
 			peer := device.ConsumeMessageResponse(&msg)
 			if peer == nil {
-				device.log.Verbosef(
-					"Received invalid response message from %s",
-					elem.endpoint.DstToString(),
-				)
+				device.log.Verbosef("Received invalid response message from %s", elem.endpoint.DstToString())
 				goto skip
 			}
 
@@ -446,11 +430,7 @@ func (device *Device) RoutineHandshake(id int) {
 			err = peer.BeginSymmetricSession()
 
 			if err != nil {
-				device.log.Errorf(
-					"%v - Failed to derive keypair: %v",
-					peer,
-					err,
-				)
+				device.log.Errorf("%v - Failed to derive keypair: %v", peer, err)
 				goto skip
 			}
 
@@ -485,10 +465,7 @@ func (peer *Peer) RoutineSequentialReceiver(maxBatchSize int) {
 				continue
 			}
 
-			if !elem.keypair.replayFilter.ValidateCounter(
-				elem.counter,
-				RejectAfterMessages,
-			) {
+			if !elem.keypair.replayFilter.ValidateCounter(elem.counter, RejectAfterMessages) {
 				continue
 			}
 
@@ -515,17 +492,13 @@ func (peer *Peer) RoutineSequentialReceiver(maxBatchSize int) {
 				}
 				field := elem.packet[IPv4offsetTotalLength : IPv4offsetTotalLength+2]
 				length := binary.BigEndian.Uint16(field)
-				if int(length) > len(elem.packet) ||
-					int(length) < ipv4.HeaderLen {
+				if int(length) > len(elem.packet) || int(length) < ipv4.HeaderLen {
 					continue
 				}
 				elem.packet = elem.packet[:length]
 				src := elem.packet[IPv4offsetSrc : IPv4offsetSrc+net.IPv4len]
 				if device.allowedips.Lookup(src) != peer {
-					device.log.Verbosef(
-						"IPv4 packet with disallowed source address from %v",
-						peer,
-					)
+					device.log.Verbosef("IPv4 packet with disallowed source address from %v", peer)
 					continue
 				}
 
@@ -542,10 +515,7 @@ func (peer *Peer) RoutineSequentialReceiver(maxBatchSize int) {
 				elem.packet = elem.packet[:length]
 				src := elem.packet[IPv6offsetSrc : IPv6offsetSrc+net.IPv6len]
 				if device.allowedips.Lookup(src) != peer {
-					device.log.Verbosef(
-						"IPv6 packet with disallowed source address from %v",
-						peer,
-					)
+					device.log.Verbosef("IPv6 packet with disallowed source address from %v", peer)
 					continue
 				}
 
@@ -563,15 +533,9 @@ func (peer *Peer) RoutineSequentialReceiver(maxBatchSize int) {
 			)
 		}
 		if len(bufs) > 0 {
-			_, err := device.tun.device.Write(
-				bufs,
-				MessageTransportOffsetContent,
-			)
+			_, err := device.tun.device.Write(bufs, MessageTransportOffsetContent)
 			if err != nil && !device.isClosed() {
-				device.log.Errorf(
-					"Failed to write packets to TUN device: %v",
-					err,
-				)
+				device.log.Errorf("Failed to write packets to TUN device: %v", err)
 			}
 		}
 		for _, elem := range *elems {

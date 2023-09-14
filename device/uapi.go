@@ -149,10 +149,7 @@ func (device *Device) IpcGetOperation(w io.Writer) error {
 				sendf("last_handshake_time_nsec=%d", nano)
 				sendf("tx_bytes=%d", peer.txBytes.Load())
 				sendf("rx_bytes=%d", peer.rxBytes.Load())
-				sendf(
-					"persistent_keepalive_interval=%d",
-					peer.persistentKeepaliveInterval.Load(),
-				)
+				sendf("persistent_keepalive_interval=%d", peer.persistentKeepaliveInterval.Load())
 
 				device.allowedips.EntriesForPeer(
 					peer,
@@ -387,11 +384,7 @@ func (device *Device) handlePublicKeyLine(
 	var publicKey NoisePublicKey
 	err := publicKey.FromHex(value)
 	if err != nil {
-		return ipcErrorf(
-			ipc.IpcErrorInvalid,
-			"failed to get peer by public key: %w",
-			err,
-		)
+		return ipcErrorf(ipc.IpcErrorInvalid, "failed to get peer by public key: %w", err)
 	}
 
 	// Ignore peer with the same public key as this device.
@@ -409,11 +402,7 @@ func (device *Device) handlePublicKeyLine(
 	if peer.created {
 		peer.Peer, err = device.NewPeer(publicKey)
 		if err != nil {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to create new peer: %w",
-				err,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to create new peer: %w", err)
 		}
 		device.log.Verbosef("%v - UAPI: Created", peer.Peer)
 	}
@@ -428,11 +417,7 @@ func (device *Device) handlePeerLine(
 	case "update_only":
 		// allow disabling of creation
 		if value != "true" {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set update only, invalid value: %v",
-				value,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set update only, invalid value: %v", value)
 		}
 		if peer.created && !peer.dummy {
 			device.RemovePeer(peer.handshake.remoteStatic)
@@ -443,11 +428,7 @@ func (device *Device) handlePeerLine(
 	case "remove":
 		// remove currently selected peer from device
 		if value != "true" {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set remove, invalid value: %v",
-				value,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set remove, invalid value: %v", value)
 		}
 		if !peer.dummy {
 			device.log.Verbosef("%v - UAPI: Removing", peer.Peer)
@@ -464,41 +445,25 @@ func (device *Device) handlePeerLine(
 		peer.handshake.mutex.Unlock()
 
 		if err != nil {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set preshared key: %w",
-				err,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set preshared key: %w", err)
 		}
 
 	case "endpoint":
 		device.log.Verbosef("%v - UAPI: Updating endpoint", peer.Peer)
 		endpoint, err := device.net.bind.ParseEndpoint(value)
 		if err != nil {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set endpoint %v: %w",
-				value,
-				err,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set endpoint %v: %w", value,  err)
 		}
 		peer.Lock()
 		defer peer.Unlock()
 		peer.endpoint = endpoint
 
 	case "persistent_keepalive_interval":
-		device.log.Verbosef(
-			"%v - UAPI: Updating persistent keepalive interval",
-			peer.Peer,
-		)
+		device.log.Verbosef("%v - UAPI: Updating persistent keepalive interval", peer.Peer)
 
 		secs, err := strconv.ParseUint(value, 10, 16)
 		if err != nil {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set persistent keepalive interval: %w",
-				err,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set persistent keepalive interval: %w", err)
 		}
 
 		old := peer.persistentKeepaliveInterval.Swap(uint32(secs))
@@ -509,11 +474,7 @@ func (device *Device) handlePeerLine(
 	case "replace_allowed_ips":
 		device.log.Verbosef("%v - UAPI: Removing all allowedips", peer.Peer)
 		if value != "true" {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to replace allowedips, invalid value: %v",
-				value,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to replace allowedips, invalid value: %v", value)
 		}
 		if peer.dummy {
 			return nil
@@ -524,11 +485,7 @@ func (device *Device) handlePeerLine(
 		device.log.Verbosef("%v - UAPI: Adding allowedip", peer.Peer)
 		prefix, err := netip.ParsePrefix(value)
 		if err != nil {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"failed to set allowed ip: %w",
-				err,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set allowed ip: %w", err)
 		}
 		if peer.dummy {
 			return nil
@@ -537,11 +494,7 @@ func (device *Device) handlePeerLine(
 
 	case "protocol_version":
 		if value != "1" {
-			return ipcErrorf(
-				ipc.IpcErrorInvalid,
-				"invalid protocol version: %v",
-				value,
-			)
+			return ipcErrorf(ipc.IpcErrorInvalid, "invalid protocol version: %v", value)
 		}
 
 	default:
@@ -589,11 +542,7 @@ func (device *Device) IpcHandle(socket net.Conn) {
 				return
 			}
 			if nextByte != '\n' {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid,
-					"trailing character in UAPI get: %q",
-					nextByte,
-				)
+				err = ipcErrorf(ipc.IpcErrorInvalid, "trailing character in UAPI get: %q", nextByte)
 				break
 			}
 			err = device.IpcGetOperation(buffered.Writer)

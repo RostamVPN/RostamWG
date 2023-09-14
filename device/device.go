@@ -160,10 +160,7 @@ func (device *Device) changeState(want deviceState) (err error) {
 	old := device.deviceState()
 	if old == deviceStateClosed {
 		// once closed, always closed
-		device.log.Verbosef(
-			"Interface closed, ignored requested state %s",
-			want,
-		)
+		device.log.Verbosef("Interface closed, ignored requested state %s", want)
 		return nil
 	}
 	switch want {
@@ -184,11 +181,7 @@ func (device *Device) changeState(want deviceState) (err error) {
 		}
 	}
 	device.log.Verbosef(
-		"Interface state was %s, requested %s, now %s",
-		old,
-		want,
-		device.deviceState(),
-	)
+		"Interface state was %s, requested %s, now %s", old, want, device.deviceState())
 	return
 }
 
@@ -293,9 +286,7 @@ func (device *Device) SetPrivateKey(sk NoisePrivateKey) error {
 	expiredPeers := make([]*Peer, 0, len(device.peers.keyMap))
 	for _, peer := range device.peers.keyMap {
 		handshake := &peer.handshake
-		handshake.precomputedStaticStatic, _ = device.staticIdentity.privateKey.sharedSecret(
-			handshake.remoteStatic,
-		)
+		handshake.precomputedStaticStatic, _ = device.staticIdentity.privateKey.sharedSecret(handshake.remoteStatic)
 		expiredPeers = append(expiredPeers, peer)
 	}
 
@@ -439,9 +430,7 @@ func (device *Device) SendKeepalivesToPeersWithCurrentKeypair() {
 	device.peers.RLock()
 	for _, peer := range device.peers.keyMap {
 		peer.keypairs.RLock()
-		sendKeepalive := peer.keypairs.current != nil &&
-			!peer.keypairs.current.created.Add(RejectAfterTime).
-				Before(time.Now())
+		sendKeepalive := peer.keypairs.current != nil && !peer.keypairs.current.created.Add(RejectAfterTime).Before(time.Now())
 		peer.keypairs.RUnlock()
 		if sendKeepalive {
 			peer.SendKeepalive()
@@ -555,12 +544,8 @@ func (device *Device) BindUpdate() error {
 
 	// start receiving routines
 	device.net.stopping.Add(len(recvFns))
-	device.queue.decryption.wg.Add(
-		len(recvFns),
-	) // each RoutineReceiveIncoming goroutine writes to device.queue.decryption
-	device.queue.handshake.wg.Add(
-		len(recvFns),
-	) // each RoutineReceiveIncoming goroutine writes to device.queue.handshake
+	device.queue.decryption.wg.Add(len(recvFns)) // each RoutineReceiveIncoming goroutine writes to device.queue.decryption
+	device.queue.handshake.wg.Add(len(recvFns)) // each RoutineReceiveIncoming goroutine writes to device.queue.handshake
 	batchSize := netc.bind.BatchSize()
 	for _, fn := range recvFns {
 		go device.RoutineReceiveIncoming(batchSize, fn)

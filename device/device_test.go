@@ -237,11 +237,7 @@ func genTestPair(
 		if _, ok := tb.(*testing.B); ok && !testing.Verbose() {
 			level = LogLevelError
 		}
-		p.dev = NewDevice(
-			p.tun.TUN(),
-			binds[i],
-			NewLogger(level, fmt.Sprintf("dev%d: ", i)),
-		)
+		p.dev = NewDevice(p.tun.TUN(),binds[i],NewLogger(level, fmt.Sprintf("dev%d: ", i)))
 		if err := p.dev.IpcSet(cfg[i]); err != nil {
 			tb.Errorf("failed to configure device %d: %v", i, err)
 			p.dev.Close()
@@ -298,12 +294,7 @@ func TestUpDown(t *testing.T) {
 		pair := genTestPair(t, false, false)
 		for i := range pair {
 			for k := range pair[i].dev.peers.keyMap {
-				pair[i].dev.IpcSet(
-					fmt.Sprintf(
-						"public_key=%s\npersistent_keepalive_interval=1\n",
-						hex.EncodeToString(k[:]),
-					),
-				)
+				pair[i].dev.IpcSet(fmt.Sprintf("public_key=%s\npersistent_keepalive_interval=1\n",hex.EncodeToString(k[:])))
 			}
 		}
 		var wg sync.WaitGroup
@@ -315,19 +306,11 @@ func TestUpDown(t *testing.T) {
 					if err := d.Up(); err != nil {
 						t.Errorf("failed up bring up device: %v", err)
 					}
-					time.Sleep(
-						time.Duration(
-							rand.Intn(int(time.Nanosecond * (0x10000 - 1))),
-						),
-					)
+					time.Sleep(time.Duration(rand.Intn(int(time.Nanosecond * (0x10000 - 1)))))
 					if err := d.Down(); err != nil {
 						t.Errorf("failed to bring down device: %v", err)
 					}
-					time.Sleep(
-						time.Duration(
-							rand.Intn(int(time.Nanosecond * (0x10000 - 1))),
-						),
-					)
+					time.Sleep(time.Duration(rand.Intn(int(time.Nanosecond * (0x10000 - 1)))))
 				}
 			}(pair[i].dev)
 		}
@@ -393,14 +376,8 @@ func TestConcurrencySafety(t *testing.T) {
 
 	// Change private keys concurrently with tunnel use.
 	t.Run("privateKey", func(t *testing.T) {
-		bad := uapiCfg(
-			"private_key",
-			"7777777777777777777777777777777777777777777777777777777777777777",
-		)
-		good := uapiCfg(
-			"private_key",
-			hex.EncodeToString(pair[0].dev.staticIdentity.privateKey[:]),
-		)
+		bad := uapiCfg("private_key", "7777777777777777777777777777777777777777777777777777777777777777")
+		good := uapiCfg("private_key", hex.EncodeToString(pair[0].dev.staticIdentity.privateKey[:]))
 		// Set iters to a large number like 1000 to flush out data races quickly.
 		// Don't leave it large. That can cause logical races
 		// in which the handshake is interleaved with key changes
@@ -520,11 +497,7 @@ func goroutineLeakCheck(t *testing.T) {
 		endGoroutines, endStacks := goroutines()
 		t.Logf("starting stacks:\n%s\n", startStacks)
 		t.Logf("ending stacks:\n%s\n", endStacks)
-		t.Fatalf(
-			"expected %d goroutines, got %d, leak?",
-			startGoroutines,
-			endGoroutines,
-		)
+		t.Fatalf("expected %d goroutines, got %d, leak?", startGoroutines, endGoroutines)
 	})
 }
 
@@ -540,24 +513,11 @@ func (b *fakeBindSized) Open(
 
 func (b *fakeBindSized) Close() error { return nil }
 
-func (b *fakeBindSized) SetMark(
-	mark uint32,
-) error {
-	return nil
-}
+func (b *fakeBindSized) SetMark(mark uint32) error {return nil }
 
-func (b *fakeBindSized) Send(
-	bufs [][]byte,
-	ep conn.Endpoint,
-) error {
-	return nil
-}
+func (b *fakeBindSized) Send(bufs [][]byte, ep conn.Endpoint) error { return nil }
 
-func (b *fakeBindSized) ParseEndpoint(
-	s string,
-) (conn.Endpoint, error) {
-	return nil, nil
-}
+func (b *fakeBindSized) ParseEndpoint(s string) (conn.Endpoint, error) { return nil, nil }
 
 func (b *fakeBindSized) BatchSize() int { return b.size }
 
@@ -567,20 +527,9 @@ type fakeTUNDeviceSized struct {
 
 func (t *fakeTUNDeviceSized) File() *os.File { return nil }
 
-func (t *fakeTUNDeviceSized) Read(
-	bufs [][]byte,
-	sizes []int,
-	offset int,
-) (n int, err error) {
-	return 0, nil
-}
+func (t *fakeTUNDeviceSized) Read(bufs [][]byte, sizes []int, offset int) (n int, err error) { return 0, nil }
 
-func (t *fakeTUNDeviceSized) Write(
-	bufs [][]byte,
-	offset int,
-) (int, error) {
-	return 0, nil
-}
+func (t *fakeTUNDeviceSized) Write(bufs [][]byte, offset int) (int, error) { return 0, nil }
 
 func (t *fakeTUNDeviceSized) MTU() (int, error) { return 0, nil }
 

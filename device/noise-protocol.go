@@ -178,9 +178,7 @@ func init() {
 	mixHash(&InitialHash, &InitialChainKey, []byte(WGIdentifier))
 }
 
-func (device *Device) CreateMessageInitiation(
-	peer *Peer,
-) (*MessageInitiation, error) {
+func (device *Device) CreateMessageInitiation(peer *Peer) (*MessageInitiation, error) {
 	device.staticIdentity.RLock()
 	defer device.staticIdentity.RUnlock()
 
@@ -222,12 +220,7 @@ func (device *Device) CreateMessageInitiation(
 		ss[:],
 	)
 	aead, _ := chacha20poly1305.New(key[:])
-	aead.Seal(
-		msg.Static[:0],
-		ZeroNonce[:],
-		device.staticIdentity.publicKey[:],
-		handshake.hash[:],
-	)
+	aead.Seal(msg.Static[:0], ZeroNonce[:], device.staticIdentity.publicKey[:], handshake.hash[:])
 	handshake.mixHash(msg.Static[:])
 
 	// encrypt timestamp
@@ -328,23 +321,14 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 	// protect against replay & flood
 
 	replay := !timestamp.After(handshake.lastTimestamp)
-	flood := time.Since(
-		handshake.lastInitiationConsumption,
-	) <= HandshakeInitationRate
+	flood := time.Since(handshake.lastInitiationConsumption) <= HandshakeInitationRate
 	handshake.mutex.RUnlock()
 	if replay {
-		device.log.Verbosef(
-			"%v - ConsumeMessageInitiation: handshake replay @ %v",
-			peer,
-			timestamp,
-		)
+		device.log.Verbosef("%v - ConsumeMessageInitiation: handshake replay @ %v", peer, timestamp)
 		return nil
 	}
 	if flood {
-		device.log.Verbosef(
-			"%v - ConsumeMessageInitiation: handshake flood",
-			peer,
-		)
+		device.log.Verbosef("%v - ConsumeMessageInitiation: handshake flood", peer)
 		return nil
 	}
 
@@ -373,9 +357,7 @@ func (device *Device) ConsumeMessageInitiation(msg *MessageInitiation) *Peer {
 	return peer
 }
 
-func (device *Device) CreateMessageResponse(
-	peer *Peer,
-) (*MessageResponse, error) {
+func (device *Device) CreateMessageResponse(peer *Peer) (*MessageResponse, error) {
 	handshake := &peer.handshake
 	handshake.mutex.Lock()
 	defer handshake.mutex.Unlock()
@@ -388,10 +370,7 @@ func (device *Device) CreateMessageResponse(
 
 	var err error
 	device.indexTable.Delete(handshake.localIndex)
-	handshake.localIndex, err = device.indexTable.NewIndexForHandshake(
-		peer,
-		handshake,
-	)
+	handshake.localIndex, err = device.indexTable.NewIndexForHandshake(peer, handshake)
 	if err != nil {
 		return nil, err
 	}
@@ -586,9 +565,7 @@ func (peer *Peer) BeginSymmetricSession() error {
 	// zero handshake
 
 	setZero(handshake.chainKey[:])
-	setZero(
-		handshake.hash[:],
-	) // Doesn't necessarily need to be zeroed. Could be used for something interesting down the line.
+	setZero(handshake.hash[:]) // Doesn't necessarily need to be zeroed. Could be used for something interesting down the line.
 	setZero(handshake.localEphemeral[:])
 	peer.handshake.state = handshakeZeroed
 
