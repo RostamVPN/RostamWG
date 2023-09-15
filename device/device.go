@@ -688,30 +688,35 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		device.aSecCfg.initPacketMagicHeader = tempASecCfg.initPacketMagicHeader
 		MessageInitiationType = device.aSecCfg.initPacketMagicHeader
 	} else {
+		device.log.Verbosef("UAPI: Using default init type")
 		MessageInitiationType = 1
 	}
-	if tempASecCfg.initPacketMagicHeader > 4 {
+	if tempASecCfg.responsePacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating response_packet_magic_header")
 		device.aSecCfg.responsePacketMagicHeader = tempASecCfg.responsePacketMagicHeader
 		MessageResponseType = device.aSecCfg.responsePacketMagicHeader
 	} else {
+		device.log.Verbosef("UAPI: Using default response type")
 		MessageResponseType = 2
 	}
-	if tempASecCfg.initPacketMagicHeader > 4 {
+	if tempASecCfg.underloadPacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating underload_packet_magic_header")
 		device.aSecCfg.underloadPacketMagicHeader = tempASecCfg.underloadPacketMagicHeader
 		MessageCookieReplyType = device.aSecCfg.underloadPacketMagicHeader
 	} else {
+		device.log.Verbosef("UAPI: Using default underload type")
 		MessageCookieReplyType = 3
 	}
-	if tempASecCfg.initPacketMagicHeader > 4 {
+	if tempASecCfg.transportPacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating transport_packet_magic_header")
 		device.aSecCfg.transportPacketMagicHeader = tempASecCfg.transportPacketMagicHeader
 		MessageTransportType = device.aSecCfg.transportPacketMagicHeader
 	} else {
+		device.log.Verbosef("UAPI: Using default transport type")
+
 		MessageTransportType = 4
 	}
 
