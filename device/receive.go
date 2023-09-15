@@ -135,15 +135,24 @@ func (device *Device) RoutineReceiveIncoming(
 			// check size of packet
 
 			packet := bufsArrs[i][:size]
+			var msgType uint32
 			if device.isAdvancedSecurityOn() {
 				var junkSize int
-				if msgType, ok := packetSizeToMsgType[size]; ok {
-					junkSize = msgTypeToJunkSize[msgType]
+				if mapMsgType, ok := packetSizeToMsgType[size]; ok {
+					junkSize = msgTypeToJunkSize[mapMsgType]
+					msgType = mapMsgType
+				} else {
+					msgType = binary.LittleEndian.Uint32(packet[:4])
+					if msgType != MessageTransportType {
+						device.log.Verbosef("ASec: Received message with unknown type")
+						continue
+					} 
 				}
 				// shift junk
 				packet = packet[junkSize:]
+			} else {
+				msgType = binary.LittleEndian.Uint32(packet[:4])
 			}
-			msgType := binary.LittleEndian.Uint32(packet[:4])
 			switch msgType {
 
 			// check if transport

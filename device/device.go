@@ -630,7 +630,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		}
 	}
 	if tempASecCfg.initPacketJunkSize != 0 {
-		if 148+tempASecCfg.initPacketJunkSize >= MaxSegmentSize {
+		if MessageInitiationSize+tempASecCfg.initPacketJunkSize >= MaxSegmentSize {
 			if err != nil {
 				err = ipcErrorf(
 					ipc.IpcErrorInvalid,
@@ -656,7 +656,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		}
 	}
 	if tempASecCfg.responsePacketJunkSize != 0 {
-		if 92+tempASecCfg.responsePacketJunkSize >= MaxSegmentSize {
+		if MessageResponseSize+tempASecCfg.responsePacketJunkSize >= MaxSegmentSize {
 			if err != nil {
 				err = ipcErrorf(
 					ipc.IpcErrorInvalid,
@@ -720,19 +720,42 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		MessageTransportType = 4
 	}
 
-	packetSizeToMsgType = map[int]uint32{
-		MessageInitiationSize + device.aSecCfg.initPacketJunkSize:   MessageInitiationType,
-		MessageResponseSize + device.aSecCfg.responsePacketJunkSize: MessageResponseType,
-		MessageCookieReplySize: MessageCookieReplyType,
-		MessageTransportSize:   MessageTransportType,
+	newInitSize := MessageInitiationSize + device.aSecCfg.initPacketJunkSize
+	newResponseSize := MessageResponseSize + device.aSecCfg.responsePacketJunkSize
+
+	if newInitSize == newResponseSize {
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`new init size:%d; and new response size:%d; should differ; %w`,
+				newInitSize,
+				newResponseSize,
+				err,
+			)
+		} else {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`new init size:%d; and new response size:%d; should differ`,
+				newInitSize,
+				newResponseSize,
+			)
+		}
+	} else {		
+		packetSizeToMsgType = map[int]uint32{
+			newInitSize:   MessageInitiationType,
+			newResponseSize: MessageResponseType,
+			MessageCookieReplySize: MessageCookieReplyType,
+			MessageTransportSize:   MessageTransportType,
+		}
+	
+		msgTypeToJunkSize = map[uint32]int{
+			MessageInitiationType:  device.aSecCfg.initPacketJunkSize,
+			MessageResponseType:    device.aSecCfg.responsePacketJunkSize,
+			MessageCookieReplyType: 0,
+			MessageTransportType:   0,
+		}
 	}
 
-	msgTypeToJunkSize = map[uint32]int{
-		MessageInitiationType:  device.aSecCfg.initPacketJunkSize,
-		MessageResponseType:    device.aSecCfg.responsePacketJunkSize,
-		MessageCookieReplyType: 0,
-		MessageTransportType:   0,
-	}
 	device.isASecOn.SetTo(isASecOn)
 	device.aSecMux.Unlock()
 	
