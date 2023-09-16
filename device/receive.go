@@ -137,10 +137,16 @@ func (device *Device) RoutineReceiveIncoming(
 			packet := bufsArrs[i][:size]
 			var msgType uint32
 			if device.isAdvancedSecurityOn() {
-				var junkSize int
-				if mapMsgType, ok := packetSizeToMsgType[size]; ok {
-					junkSize = msgTypeToJunkSize[mapMsgType]
-					msgType = mapMsgType
+				if assumedMsgType, ok := packetSizeToMsgType[size]; ok {
+					junkSize := msgTypeToJunkSize[assumedMsgType]
+					// transport size can align with other header types; 
+					// making sure we have the right msgType
+					msgType = binary.LittleEndian.Uint32(packet[junkSize:4])
+					if msgType == assumedMsgType {
+						packet = packet[junkSize:]
+					} else {
+						msgType = binary.LittleEndian.Uint32(packet[:4])
+					}
 				} else {
 					msgType = binary.LittleEndian.Uint32(packet[:4])
 					if msgType != MessageTransportType {
@@ -148,8 +154,6 @@ func (device *Device) RoutineReceiveIncoming(
 						continue
 					} 
 				}
-				// shift junk
-				packet = packet[junkSize:]
 			} else {
 				msgType = binary.LittleEndian.Uint32(packet[:4])
 			}
