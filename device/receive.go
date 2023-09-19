@@ -141,10 +141,11 @@ func (device *Device) RoutineReceiveIncoming(
 					junkSize := msgTypeToJunkSize[assumedMsgType]
 					// transport size can align with other header types; 
 					// making sure we have the right msgType
-					msgType = binary.LittleEndian.Uint32(packet[junkSize:4])
+					msgType = binary.LittleEndian.Uint32(packet[junkSize:junkSize+4])
 					if msgType == assumedMsgType {
 						packet = packet[junkSize:]
 					} else {
+						device.log.Verbosef("Transport packet lined up with another msg type")
 						msgType = binary.LittleEndian.Uint32(packet[:4])
 					}
 				} else {
