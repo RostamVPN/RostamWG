@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"golang.zx2c4.com/wireguard/conn"
-	"golang.zx2c4.com/wireguard/conn/bindtest"
-	"golang.zx2c4.com/wireguard/tun"
-	"golang.zx2c4.com/wireguard/tun/tuntest"
+	"github.com/amnezia-vpn/amnezia-wg/conn"
+	"github.com/amnezia-vpn/amnezia-wg/conn/bindtest"
+	"github.com/amnezia-vpn/amnezia-wg/tun"
+	"github.com/amnezia-vpn/amnezia-wg/tun/tuntest"
 )
 
 // uapiCfg returns a string that contains cfg formatted use with IpcSet.
