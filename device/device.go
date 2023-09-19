@@ -566,6 +566,26 @@ func (device *Device) isAdvancedSecurityOn() bool {
 }
 
 func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
+	isSameMap := map[uint32]bool{}
+	isSameMap[tempASecCfg.initPacketMagicHeader] = true
+	isSameMap[tempASecCfg.responsePacketMagicHeader] = true
+	isSameMap[tempASecCfg.underloadPacketMagicHeader] = true
+	isSameMap[tempASecCfg.transportPacketMagicHeader] = true
+
+	// size will be different if same values
+	if len(isSameMap) != 4 {
+		err = ipcErrorf(
+			ipc.IpcErrorInvalid,
+			`magic headers should differ; got: init:%d; recv:%d; unde:%d;
+			tran:%d`,
+			tempASecCfg.initPacketMagicHeader,
+			tempASecCfg.responsePacketMagicHeader,
+			tempASecCfg.underloadPacketMagicHeader,
+			tempASecCfg.transportPacketMagicHeader,
+		)
+		return 
+	}
+	
 	isASecOn := false
 	device.aSecMux.Lock()
 	if tempASecCfg.junkPacketCount < 0 {
@@ -759,5 +779,5 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 	device.isASecOn.SetTo(isASecOn)
 	device.aSecMux.Unlock()
 	
-	return nil
+	return err
 }
