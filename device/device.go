@@ -583,6 +583,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 			tempASecCfg.underloadPacketMagicHeader,
 			tempASecCfg.transportPacketMagicHeader,
 		)
+		device.isASecOn.UnSet()
 		return 
 	}
 	
