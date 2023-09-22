@@ -565,28 +565,7 @@ func (device *Device) isAdvancedSecurityOn() bool {
 	return device.isASecOn.IsSet()
 }
 
-func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
-	isSameMap := map[uint32]bool{}
-	isSameMap[tempASecCfg.initPacketMagicHeader] = true
-	isSameMap[tempASecCfg.responsePacketMagicHeader] = true
-	isSameMap[tempASecCfg.underloadPacketMagicHeader] = true
-	isSameMap[tempASecCfg.transportPacketMagicHeader] = true
-
-	// size will be different if same values
-	if len(isSameMap) != 4 {
-		err = ipcErrorf(
-			ipc.IpcErrorInvalid,
-			`magic headers should differ; got: init:%d; recv:%d; unde:%d;
-			tran:%d`,
-			tempASecCfg.initPacketMagicHeader,
-			tempASecCfg.responsePacketMagicHeader,
-			tempASecCfg.underloadPacketMagicHeader,
-			tempASecCfg.transportPacketMagicHeader,
-		)
-		device.isASecOn.UnSet()
-		return 
-	}
-	
+func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {	
 	isASecOn := false
 	device.aSecMux.Lock()
 	if tempASecCfg.junkPacketCount < 0 {
@@ -737,8 +716,39 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		MessageTransportType = device.aSecCfg.transportPacketMagicHeader
 	} else {
 		device.log.Verbosef("UAPI: Using default transport type")
-
 		MessageTransportType = 4
+	}
+
+	isSameMap := map[uint32]bool{}
+	isSameMap[MessageInitiationType] = true
+	isSameMap[MessageResponseType] = true
+	isSameMap[MessageCookieReplyType] = true
+	isSameMap[MessageTransportType] = true
+
+	// size will be different if same values
+	if len(isSameMap) != 4 {
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`magic headers should differ; got: init:%d; recv:%d; unde:%d;
+				tran:%d; %w`,
+				MessageInitiationType,
+				MessageResponseType,
+				MessageCookieReplyType,
+				MessageTransportType,
+				err,
+			)
+		} else {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`magic headers should differ; got: init:%d; recv:%d; unde:%d;
+				tran:%d`,
+				MessageInitiationType,
+				MessageResponseType,
+				MessageCookieReplyType,
+				MessageTransportType,
+			)
+		}
 	}
 
 	newInitSize := MessageInitiationSize + device.aSecCfg.initPacketJunkSize

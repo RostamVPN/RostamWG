@@ -191,7 +191,10 @@ func (device *Device) IpcSetOperation(r io.Reader) (err error) {
 		line := scanner.Text()
 		if line == "" {
 			// Blank line means terminate operation.
-			device.handlePostConfig(&tempASecCfg)
+			err := device.handlePostConfig(&tempASecCfg)
+			if err != nil {
+				return err
+			}
 			peer.handlePostConfig()
 			return nil
 		}
@@ -227,7 +230,10 @@ func (device *Device) IpcSetOperation(r io.Reader) (err error) {
 			return err
 		}
 	}
-	device.handlePostConfig(&tempASecCfg)
+	err = device.handlePostConfig(&tempASecCfg)
+	if err != nil {
+		return err
+	}
 	peer.handlePostConfig()
 
 	if err := scanner.Err(); err != nil {
