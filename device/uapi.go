@@ -293,6 +293,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		if err != nil {
 			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse junk_packet_count %w", err)
 		}
+		device.log.Verbosef("UAPI: Updating junk_packet_count")
 		tempASecCfg.junkPacketCount = junkPacketCount
 
 	case "jmin":
@@ -300,6 +301,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		if err != nil {
 			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse junk_packet_min_size %w", err)
 		}
+		device.log.Verbosef("UAPI: Updating junk_packet_min_size")
 		tempASecCfg.junkPacketMinSize = junkPacketMinSize
 
 	case "jmax":
@@ -307,6 +309,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		if err != nil {
 			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse junk_packet_max_size %w", err)
 		}
+		device.log.Verbosef("UAPI: Updating junk_packet_max_size")
 		tempASecCfg.junkPacketMaxSize = junkPacketMaxSize
 
 	case "s1":
@@ -314,6 +317,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		if err != nil {
 			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse init_packet_junk_size %w", err)
 		}
+		device.log.Verbosef("UAPI: Updating init_packet_junk_size")
 		tempASecCfg.initPacketJunkSize = initPacketJunkSize
 
 	case "s2":
@@ -321,6 +325,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		if err != nil {
 			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse response_packet_junk_size %w", err)
 		}
+		device.log.Verbosef("UAPI: Updating response_packet_junk_size")
 		tempASecCfg.responsePacketJunkSize = responsePacketJunkSize
 
 	case "h1":

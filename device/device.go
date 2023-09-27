@@ -573,113 +573,113 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 			ipc.IpcErrorInvalid, 
 			"JunkPacketCount should be non negative",
 		)
-	} else if tempASecCfg.junkPacketCount > 0 {
-		device.log.Verbosef("UAPI: Updating junk_packet_count")
-		device.aSecCfg.junkPacketCount = tempASecCfg.junkPacketCount
+	}
+	device.aSecCfg.junkPacketCount = tempASecCfg.junkPacketCount
+	if tempASecCfg.junkPacketCount != 0 {
 		isASecOn = true
 	}
+	
+	device.aSecCfg.junkPacketMinSize = tempASecCfg.junkPacketMinSize
 	if tempASecCfg.junkPacketMinSize != 0 {
-		device.log.Verbosef("UAPI: Updating junk_packet_min_size")
-		device.aSecCfg.junkPacketMinSize = tempASecCfg.junkPacketMinSize
 		isASecOn = true
 	}
-	if tempASecCfg.junkPacketMaxSize != 0 {
-		if tempASecCfg.junkPacketMaxSize == tempASecCfg.junkPacketMinSize {
-			tempASecCfg.junkPacketMaxSize++ // to make rand gen work
-		}
-		if tempASecCfg.junkPacketMaxSize >= MaxSegmentSize{
-			device.aSecCfg.junkPacketMinSize = 0
-			device.aSecCfg.junkPacketMaxSize = 1
-			if err != nil {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid, 
-					"JunkPacketMaxSize: %d; should be smaller than maxSegmentSize: %d; %w",
-					tempASecCfg.junkPacketMaxSize,
-					MaxSegmentSize,
-					err,
-				)
-			} else {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid, 
-					"JunkPacketMaxSize: %d; should be smaller than maxSegmentSize: %d",
-					tempASecCfg.junkPacketMaxSize,
-					MaxSegmentSize,
-				)
-			}
-		} else if tempASecCfg.junkPacketMaxSize < tempASecCfg.junkPacketMinSize {
-			if err != nil {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid, 
-					"maxSize: %d; should be greater than minSize: %d; %w",
-					tempASecCfg.junkPacketMaxSize,
-					tempASecCfg.junkPacketMinSize, 
-					err,
-				)
-			} else {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid, 
-					"maxSize: %d; should be greater than minSize: %d",
-					tempASecCfg.junkPacketMaxSize,
-					tempASecCfg.junkPacketMinSize, 
-				)
-			}
+
+	if tempASecCfg.junkPacketMaxSize == tempASecCfg.junkPacketMinSize {
+		tempASecCfg.junkPacketMaxSize++ // to make rand gen work
+	}
+
+	if tempASecCfg.junkPacketMaxSize >= MaxSegmentSize{
+		device.aSecCfg.junkPacketMinSize = 0
+		device.aSecCfg.junkPacketMaxSize = 1
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid, 
+				"JunkPacketMaxSize: %d; should be smaller than maxSegmentSize: %d; %w",
+				tempASecCfg.junkPacketMaxSize,
+				MaxSegmentSize,
+				err,
+			)
 		} else {
-			device.log.Verbosef("UAPI: Updating junk_packet_max_size")
-			device.aSecCfg.junkPacketMaxSize = tempASecCfg.junkPacketMaxSize
-			isASecOn = true
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid, 
+				"JunkPacketMaxSize: %d; should be smaller than maxSegmentSize: %d",
+				tempASecCfg.junkPacketMaxSize,
+				MaxSegmentSize,
+			)
 		}
+	} else if tempASecCfg.junkPacketMaxSize < tempASecCfg.junkPacketMinSize {
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid, 
+				"maxSize: %d; should be greater than minSize: %d; %w",
+				tempASecCfg.junkPacketMaxSize,
+				tempASecCfg.junkPacketMinSize, 
+				err,
+			)
+		} else {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid, 
+				"maxSize: %d; should be greater than minSize: %d",
+				tempASecCfg.junkPacketMaxSize,
+				tempASecCfg.junkPacketMinSize, 
+			)
+		}
+	} else {
+		device.aSecCfg.junkPacketMaxSize = tempASecCfg.junkPacketMaxSize
 	}
+
+	if tempASecCfg.junkPacketMaxSize != 0 {
+		isASecOn = true
+	}
+
+	if MessageInitiationSize+tempASecCfg.initPacketJunkSize >= MaxSegmentSize {
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`init header size(148) + junkSize:%d; should be smaller than maxSegmentSize: %d; %w`,
+				tempASecCfg.initPacketJunkSize,
+				MaxSegmentSize,
+				err,
+			)
+		} else {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`init header size(148) + junkSize:%d; should be smaller than maxSegmentSize: %d`,
+				tempASecCfg.initPacketJunkSize,
+				MaxSegmentSize,
+			)
+		}
+	} else {	
+		device.aSecCfg.initPacketJunkSize = tempASecCfg.initPacketJunkSize
+	}
+	
 	if tempASecCfg.initPacketJunkSize != 0 {
-		if MessageInitiationSize+tempASecCfg.initPacketJunkSize >= MaxSegmentSize {
-			if err != nil {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid,
-					`init header size(148) + junkSize:%d; 
-					should be smaller than maxSegmentSize: %d; %w`,
-					tempASecCfg.initPacketJunkSize,
-					MaxSegmentSize,
-					err,
-				)
-			} else {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid,
-					`init header size(148) + junkSize:%d; 
-					should be smaller than maxSegmentSize: %d`,
-					tempASecCfg.initPacketJunkSize,
-					MaxSegmentSize,
-				)
-			}
-		} else {	
-			device.log.Verbosef("UAPI: Updating init_packet_junk_size")
-			device.aSecCfg.initPacketJunkSize = tempASecCfg.initPacketJunkSize
-			isASecOn = true
-		}
+		isASecOn = true
 	}
-	if tempASecCfg.responsePacketJunkSize != 0 {
-		if MessageResponseSize+tempASecCfg.responsePacketJunkSize >= MaxSegmentSize {
-			if err != nil {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid,
-					`response header size(92) + junkSize:%d; 
-					should be smaller than maxSegmentSize: %d; %w`,
-					tempASecCfg.responsePacketJunkSize,
-					MaxSegmentSize,
-					err,
-				)
-			} else {
-				err = ipcErrorf(
-					ipc.IpcErrorInvalid,
-					`response header size(92) + junkSize:%d; 
-					should be smaller than maxSegmentSize: %d`,
-					tempASecCfg.responsePacketJunkSize,
-					MaxSegmentSize,
-				)
-			}
-		} else {	
-			device.log.Verbosef("UAPI: Updating response_packet_junk_size")
-			device.aSecCfg.responsePacketJunkSize = tempASecCfg.responsePacketJunkSize
-			isASecOn = true
+
+	if MessageResponseSize+tempASecCfg.responsePacketJunkSize >= MaxSegmentSize {
+		if err != nil {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`response header size(92) + junkSize:%d; should be smaller than maxSegmentSize: %d; %w`,
+				tempASecCfg.responsePacketJunkSize,
+				MaxSegmentSize,
+				err,
+			)
+		} else {
+			err = ipcErrorf(
+				ipc.IpcErrorInvalid,
+				`response header size(92) + junkSize:%d; should be smaller than maxSegmentSize: %d`,
+				tempASecCfg.responsePacketJunkSize,
+				MaxSegmentSize,
+			)
 		}
+	} else {	
+		device.aSecCfg.responsePacketJunkSize = tempASecCfg.responsePacketJunkSize
+	}
+
+	if tempASecCfg.responsePacketJunkSize != 0 {
+		isASecOn = true
 	}
 
 	if tempASecCfg.initPacketMagicHeader > 4 {
@@ -691,6 +691,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		device.log.Verbosef("UAPI: Using default init type")
 		MessageInitiationType = 1
 	}
+	
 	if tempASecCfg.responsePacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating response_packet_magic_header")
@@ -700,6 +701,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		device.log.Verbosef("UAPI: Using default response type")
 		MessageResponseType = 2
 	}
+	
 	if tempASecCfg.underloadPacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating underload_packet_magic_header")
@@ -709,6 +711,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		device.log.Verbosef("UAPI: Using default underload type")
 		MessageCookieReplyType = 3
 	}
+
 	if tempASecCfg.transportPacketMagicHeader > 4 {
 		isASecOn = true
 		device.log.Verbosef("UAPI: Updating transport_packet_magic_header")
@@ -730,8 +733,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		if err != nil {
 			err = ipcErrorf(
 				ipc.IpcErrorInvalid,
-				`magic headers should differ; got: init:%d; recv:%d; unde:%d;
-				tran:%d; %w`,
+				`magic headers should differ; got: init:%d; recv:%d; unde:%d; tran:%d; %w`,
 				MessageInitiationType,
 				MessageResponseType,
 				MessageCookieReplyType,
@@ -741,8 +743,7 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		} else {
 			err = ipcErrorf(
 				ipc.IpcErrorInvalid,
-				`magic headers should differ; got: init:%d; recv:%d; unde:%d;
-				tran:%d`,
+				`magic headers should differ; got: init:%d; recv:%d; unde:%d; tran:%d`,
 				MessageInitiationType,
 				MessageResponseType,
 				MessageCookieReplyType,
