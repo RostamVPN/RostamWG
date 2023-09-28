@@ -584,7 +584,9 @@ func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {
 		isASecOn = true
 	}
 
-	if tempASecCfg.junkPacketMaxSize == tempASecCfg.junkPacketMinSize {
+	if device.aSecCfg.junkPacketCount > 0 && 
+		tempASecCfg.junkPacketMaxSize == tempASecCfg.junkPacketMinSize {
+			
 		tempASecCfg.junkPacketMaxSize++ // to make rand gen work
 	}
 

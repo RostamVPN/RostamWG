@@ -248,7 +248,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		var sk NoisePrivateKey
 		err := sk.FromMaybeZeroHex(value)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"failed to set private_key: %w",err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set private_key: %w", err)
 		}
 		device.log.Verbosef("UAPI: Updating private key")
 		device.SetPrivateKey(sk)
@@ -256,7 +256,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "listen_port":
 		port, err := strconv.ParseUint(value, 10, 16)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"failed to parse listen_port: %w",err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to parse listen_port: %w", err)
 		}
 
 		// update port and rebind
@@ -267,7 +267,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 		device.net.Unlock()
 
 		if err := device.BindUpdate(); err != nil {
-			return ipcErrorf(ipc.IpcErrorPortInUse,"failed to set listen_port: %w",err)
+			return ipcErrorf(ipc.IpcErrorPortInUse, "failed to set listen_port: %w", err)
 		}
 
 	case "fwmark":
@@ -278,12 +278,12 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 
 		device.log.Verbosef("UAPI: Updating fwmark")
 		if err := device.BindSetMark(uint32(mark)); err != nil {
-			return ipcErrorf(ipc.IpcErrorPortInUse,"failed to update fwmark: %w", err)
+			return ipcErrorf(ipc.IpcErrorPortInUse, "failed to update fwmark: %w", err)
 		}
 
 	case "replace_peers":
 		if value != "true" {
-			return ipcErrorf(ipc.IpcErrorInvalid,"failed to set replace_peers, invalid value: %v", value)
+			return ipcErrorf(ipc.IpcErrorInvalid, "failed to set replace_peers, invalid value: %v", value)
 		}
 		device.log.Verbosef("UAPI: Removing all peers")
 		device.RemoveAllPeers()
@@ -299,7 +299,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "jmin":
 		junkPacketMinSize, err := strconv.Atoi(value)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse junk_packet_min_size %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse junk_packet_min_size %w", err)
 		}
 		device.log.Verbosef("UAPI: Updating junk_packet_min_size")
 		tempASecCfg.junkPacketMinSize = junkPacketMinSize
@@ -307,7 +307,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "jmax":
 		junkPacketMaxSize, err := strconv.Atoi(value)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse junk_packet_max_size %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse junk_packet_max_size %w", err)
 		}
 		device.log.Verbosef("UAPI: Updating junk_packet_max_size")
 		tempASecCfg.junkPacketMaxSize = junkPacketMaxSize
@@ -315,7 +315,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "s1":
 		initPacketJunkSize, err := strconv.Atoi(value)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse init_packet_junk_size %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse init_packet_junk_size %w", err)
 		}
 		device.log.Verbosef("UAPI: Updating init_packet_junk_size")
 		tempASecCfg.initPacketJunkSize = initPacketJunkSize
@@ -323,7 +323,7 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "s2":
 		responsePacketJunkSize, err := strconv.Atoi(value)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse response_packet_junk_size %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse response_packet_junk_size %w", err)
 		}
 		device.log.Verbosef("UAPI: Updating response_packet_junk_size")
 		tempASecCfg.responsePacketJunkSize = responsePacketJunkSize
@@ -331,32 +331,32 @@ func (device *Device) handleDeviceLine(key, value string, tempASecCfg *aSecCfgTy
 	case "h1":
 		initPacketMagicHeader, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse init_packet_magic_header %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse init_packet_magic_header %w", err)
 		}
 		tempASecCfg.initPacketMagicHeader = uint32(initPacketMagicHeader)
 
 	case "h2":
 		responsePacketMagicHeader, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse response_packet_magic_header %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse response_packet_magic_header %w", err)
 		}
 		tempASecCfg.responsePacketMagicHeader = uint32(responsePacketMagicHeader)
 
 	case "h3":
 		underloadPacketMagicHeader, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse underload_packet_magic_header %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse underload_packet_magic_header %w", err)
 		}
 		tempASecCfg.underloadPacketMagicHeader = uint32(underloadPacketMagicHeader)
 
 	case "h4":
 		transportPacketMagicHeader, err := strconv.ParseUint(value, 10, 32)
 		if err != nil {
-			return ipcErrorf(ipc.IpcErrorInvalid,"faield to parse transport_packet_magic_header %w", err)
+			return ipcErrorf(ipc.IpcErrorInvalid, "faield to parse transport_packet_magic_header %w", err)
 		}
 		tempASecCfg.transportPacketMagicHeader = uint32(transportPacketMagicHeader)
 	default:
-		return ipcErrorf(ipc.IpcErrorInvalid,"invalid UAPI device key: %v",key)
+		return ipcErrorf(ipc.IpcErrorInvalid, "invalid UAPI device key: %v",key)
 	}
 
 	return nil
