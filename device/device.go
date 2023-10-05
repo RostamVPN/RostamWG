@@ -566,6 +566,19 @@ func (device *Device) isAdvancedSecurityOn() bool {
 }
 
 func (device *Device) handlePostConfig(tempASecCfg *aSecCfgType) (err error) {	
+	
+	if tempASecCfg.junkPacketCount == 0 &&
+		tempASecCfg.junkPacketMaxSize == 0 &&
+		tempASecCfg.junkPacketMinSize == 0 &&
+		tempASecCfg.initPacketJunkSize == 0 &&
+		tempASecCfg.responsePacketJunkSize == 0 &&
+		tempASecCfg.initPacketMagicHeader == 0 &&
+		tempASecCfg.responsePacketMagicHeader == 0 &&
+		tempASecCfg.underloadPacketMagicHeader == 0 &&
+		tempASecCfg.transportPacketMagicHeader == 0 {
+		return err
+	}
+	
 	isASecOn := false
 	device.aSecMux.Lock()
 	if tempASecCfg.junkPacketCount < 0 {
