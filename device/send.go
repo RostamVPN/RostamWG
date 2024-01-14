@@ -137,10 +137,13 @@ func (peer *Peer) SendHandshakeInitiation(isRetry bool) error {
 			return err
 		}
 
-		err = peer.SendBuffers(junks)
-		if err != nil {
-			peer.device.log.Errorf("%v - Failed to send junk packets: %v", peer, err)
-			return err
+		if len(junks) > 0 {
+			err = peer.SendBuffers(junks)
+
+			if err != nil {
+				peer.device.log.Errorf("%v - Failed to send junk packets: %v", peer, err)
+				return err
+			}
 		}
 
 		peer.device.aSecMux.RLock()
