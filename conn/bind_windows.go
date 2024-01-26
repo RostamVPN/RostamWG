@@ -17,7 +17,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/amnezia-vpn/amneziawg-go/conn/winrio"
+	"github.com/RostamVPN/wireguard/conn/winrio"
 )
 
 const (

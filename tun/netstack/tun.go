@@ -22,7 +22,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/amnezia-vpn/amneziawg-go/tun"
+	"github.com/RostamVPN/wireguard/tun"
 
 	"golang.org/x/net/dns/dnsmessage"
 	"gvisor.dev/gvisor/pkg/buffer"

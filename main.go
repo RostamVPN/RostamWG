@@ -14,10 +14,10 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/amnezia-vpn/amneziawg-go/conn"
-	"github.com/amnezia-vpn/amneziawg-go/device"
-	"github.com/amnezia-vpn/amneziawg-go/ipc"
-	"github.com/amnezia-vpn/amneziawg-go/tun"
+	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/wireguard/device"
+	"github.com/RostamVPN/wireguard/ipc"
+	"github.com/RostamVPN/wireguard/tun"
 	"golang.org/x/sys/unix"
 )
 

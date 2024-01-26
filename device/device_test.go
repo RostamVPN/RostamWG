@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/amnezia-vpn/amneziawg-go/conn"
-	"github.com/amnezia-vpn/amneziawg-go/conn/bindtest"
-	"github.com/amnezia-vpn/amneziawg-go/tun"
-	"github.com/amnezia-vpn/amneziawg-go/tun/tuntest"
+	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/wireguard/conn/bindtest"
+	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/wireguard/tun/tuntest"
 )
 
 // uapiCfg returns a string that contains cfg formatted use with IpcSet.

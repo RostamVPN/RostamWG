@@ -8,7 +8,7 @@ package device
 import (
 	"errors"
 
-	"github.com/amnezia-vpn/amneziawg-go/conn"
+	"github.com/RostamVPN/wireguard/conn"
 )
 
 type DummyDatagram struct {
