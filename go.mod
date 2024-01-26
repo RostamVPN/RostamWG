@@ -1,4 +1,4 @@
-module github.com/amnezia-vpn/amnezia-wg
+module  github.com/RostamVPN/wireguard@
 
 go 1.20
 
