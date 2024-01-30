@@ -1,6 +1,6 @@
-# Go Implementation of AmneziaWG
+# Go Implementation of RostamWG
 
-AmneziaWG is a contemporary version of the WireGuard protocol. It's a fork of WireGuard-Go and offers protection against detection by Deep Packet Inspection (DPI) systems. At the same time, it retains the simplified architecture and high performance of the original.
+RostamWG is a contemporary version of the WireGuard protocol. It's a fork of WireGuard-Go and offers protection against detection by Deep Packet Inspection (DPI) systems. At the same time, it retains the simplified architecture and high performance of the original.
 
 The precursor, WireGuard, is known for its efficiency but had issues with detection due to its distinctive packet signatures.
 AmneziaWG addresses this problem by employing advanced obfuscation methods, allowing its traffic to blend seamlessly with regular internet traffic.
