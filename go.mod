@@ -1,4 +1,4 @@
-module github.com/RostamVPN/wireguard
+module github.com/RostamVPN/RostamWG
 
 go 1.20
 
