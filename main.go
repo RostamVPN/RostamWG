@@ -14,10 +14,10 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/device"
-	"github.com/RostamVPN/wireguard/ipc"
-	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/device"
+	"github.com/RostamVPN/RostamWG/ipc"
+	"github.com/RostamVPN/RostamWG/tun"
 	"golang.org/x/sys/unix"
 )
 
