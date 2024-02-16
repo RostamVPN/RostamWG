@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/RostamVPN/wireguard/ipc"
+	"github.com/RostamVPN/RostamWG/ipc"
 )
 
 type IPCError struct {

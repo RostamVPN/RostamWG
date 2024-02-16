@@ -11,7 +11,7 @@ import (
 	"net/netip"
 	"os"
 
-	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/RostamWG/tun"
 )
 
 func Ping(dst, src netip.Addr) []byte {

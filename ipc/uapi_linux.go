@@ -9,7 +9,7 @@ import (
 	"net"
 	"os"
 
-	"github.com/RostamVPN/wireguard/rwcancel"
+	"github.com/RostamVPN/RostamWG/rwcancel"
 	"golang.org/x/sys/unix"
 )
 

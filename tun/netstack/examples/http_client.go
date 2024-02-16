@@ -13,9 +13,9 @@ import (
 	"net/http"
 	"net/netip"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/device"
-	"github.com/RostamVPN/wireguard/tun/netstack"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/device"
+	"github.com/RostamVPN/RostamWG/tun/netstack"
 )
 
 func main() {

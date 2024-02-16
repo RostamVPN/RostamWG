@@ -7,7 +7,7 @@
 
 package device
 
-import "github.com/RostamVPN/wireguard/conn"
+import "github.com/RostamVPN/RostamWG/conn"
 
 const (
 	QueueStagedSize            = conn.IdealBatchSize

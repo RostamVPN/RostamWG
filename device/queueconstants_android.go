@@ -5,7 +5,7 @@
 
 package device
 
-import "github.com/RostamVPN/wireguard/conn"
+import "github.com/RostamVPN/RostamWG/conn"
 
 /* Reduce memory consumption for Android */
 

@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/RostamVPN/wireguard/ipc/namedpipe"
+	"github.com/RostamVPN/RostamWG/ipc/namedpipe"
 	"golang.org/x/sys/windows"
 )
 

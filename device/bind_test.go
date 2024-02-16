@@ -8,7 +8,7 @@ package device
 import (
 	"errors"
 
-	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/RostamWG/conn"
 )
 
 type DummyDatagram struct {

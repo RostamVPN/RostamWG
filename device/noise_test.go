@@ -10,8 +10,8 @@ import (
 	"encoding/binary"
 	"testing"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/tun/tuntest"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/tun/tuntest"
 )
 
 func TestCurveWrappers(t *testing.T) {

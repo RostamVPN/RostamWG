@@ -11,11 +11,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/ipc"
-	"github.com/RostamVPN/wireguard/ratelimiter"
-	"github.com/RostamVPN/wireguard/rwcancel"
-	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/ipc"
+	"github.com/RostamVPN/RostamWG/ratelimiter"
+	"github.com/RostamVPN/RostamWG/rwcancel"
+	"github.com/RostamVPN/RostamWG/tun"
 	"github.com/tevino/abool/v2"
 )
 

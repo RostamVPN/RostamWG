@@ -8,7 +8,7 @@ package device
 import (
 	"fmt"
 
-	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/RostamWG/tun"
 )
 
 const DefaultMTU = 1420

@@ -12,7 +12,7 @@ import (
 	"net/netip"
 	"os"
 
-	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/RostamWG/conn"
 )
 
 type ChannelBind struct {

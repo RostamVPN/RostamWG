@@ -17,8 +17,8 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/rwcancel"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/rwcancel"
 	"golang.org/x/sys/unix"
 )
 

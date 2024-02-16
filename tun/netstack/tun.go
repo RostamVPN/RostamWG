@@ -22,7 +22,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/RostamVPN/wireguard/tun"
+	"github.com/RostamVPN/RostamWG/tun"
 
 	"golang.org/x/net/dns/dnsmessage"
 	"gvisor.dev/gvisor/pkg/buffer"

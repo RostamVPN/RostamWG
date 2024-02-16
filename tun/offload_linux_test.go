@@ -9,7 +9,7 @@ import (
 	"net/netip"
 	"testing"
 
-	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/RostamWG/conn"
 	"golang.org/x/sys/unix"
 	"gvisor.dev/gvisor/pkg/tcpip"
 	"gvisor.dev/gvisor/pkg/tcpip/header"

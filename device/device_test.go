@@ -20,10 +20,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/conn/bindtest"
-	"github.com/RostamVPN/wireguard/tun"
-	"github.com/RostamVPN/wireguard/tun/tuntest"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/conn/bindtest"
+	"github.com/RostamVPN/RostamWG/tun"
+	"github.com/RostamVPN/RostamWG/tun/tuntest"
 )
 
 // uapiCfg returns a string that contains cfg formatted use with IpcSet.

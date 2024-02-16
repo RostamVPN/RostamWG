@@ -12,7 +12,7 @@ import (
 	"io"
 	"unsafe"
 
-	"github.com/RostamVPN/wireguard/conn"
+	"github.com/RostamVPN/RostamWG/conn"
 	"golang.org/x/sys/unix"
 )
 

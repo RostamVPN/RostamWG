@@ -17,9 +17,9 @@ import (
 	"golang.org/x/net/icmp"
 	"golang.org/x/net/ipv4"
 
-	"github.com/RostamVPN/wireguard/conn"
-	"github.com/RostamVPN/wireguard/device"
-	"github.com/RostamVPN/wireguard/tun/netstack"
+	"github.com/RostamVPN/RostamWG/conn"
+	"github.com/RostamVPN/RostamWG/device"
+	"github.com/RostamVPN/RostamWG/tun/netstack"
 )
 
 func main() {

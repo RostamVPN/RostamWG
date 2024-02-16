@@ -11,7 +11,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/RostamVPN/wireguard/replay"
+	"github.com/RostamVPN/RostamWG/replay"
 )
 
 /* Due to limitations in Go and /x/crypto there is currently

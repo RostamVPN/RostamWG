@@ -17,7 +17,7 @@ import (
 
 	"golang.org/x/sys/windows"
 
-	"github.com/RostamVPN/wireguard/conn/winrio"
+	"github.com/RostamVPN/RostamWG/conn/winrio"
 )
 
 const (
